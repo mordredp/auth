@@ -8,6 +8,7 @@ func (a *authenticator) Authorize(next http.Handler) http.Handler {
 
 		if !user.Authenticated {
 			http.Redirect(w, r, "/", http.StatusFound)
+			return
 		}
 
 		next.ServeHTTP(w, r)
