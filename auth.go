@@ -2,7 +2,6 @@ package auth
 
 import (
 	"log"
-	"text/template"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,7 +14,6 @@ type authenticator struct {
 	cookieName       string
 	maxSessionLength time.Duration
 	lastCleanup      time.Time
-	tpl              *template.Template
 	providers        []provider.Provider
 }
 
@@ -30,7 +28,6 @@ func New(sessionSeconds int, options ...Option) *authenticator {
 		cookieName:       uuid.NewString(),
 		maxSessionLength: time.Duration(sessionSeconds) * time.Second,
 		lastCleanup:      time.Now(),
-		tpl:              template.Must(template.ParseGlob("auth/templates/*.gohtml")),
 		providers:        make([]provider.Provider, 0),
 	}
 
