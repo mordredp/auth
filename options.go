@@ -15,7 +15,6 @@ func LDAP(addr string, baseDN string, username string, password string) func(a *
 			addr,
 			baseDN,
 			ldap.Bind(username, password),
-			ldap.Fields("asd", "asd"),
 		)
 
 		if err != nil {
