@@ -8,13 +8,16 @@ import (
 )
 
 // LDAP adds an LDAP provider to the Authenticator.
-func LDAP(addr string, baseDN string, username string, password string) func(a *authenticator) error {
+func LDAP(addr string, baseDN string, username string, password string, options ...ldap.Option) func(a *authenticator) error {
 	return func(a *authenticator) error {
+
+		ldapOptions := append([]ldap.Option{}, options...)
+		ldapOptions = append(ldapOptions, ldap.Bind(username, password))
 
 		ldap, err := ldap.NewDirectory(
 			addr,
 			baseDN,
-			ldap.Bind(username, password),
+			ldapOptions...,
 		)
 
 		if err != nil {
