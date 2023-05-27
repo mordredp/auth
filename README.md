@@ -2,7 +2,7 @@ WIP README
 
 # auth
 `auth` is a library written in Go to provide authentication for the standard HTTP server.
-It strives to be idiomatic, depend only on stdlib, and be simple to use.
+It strives to be idiomatic, depend mostly on stdlib, and be simple to use.
 
 ## Install
 `go get -u github.com/mordredp/auth`
