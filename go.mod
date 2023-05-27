@@ -7,4 +7,7 @@ require (
 	github.com/google/uuid v1.3.0
 )
 
-require gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
+require (
+	github.com/pkg/errors v0.9.1
+	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
+)

@@ -23,9 +23,9 @@ func (a *authenticator) Logout(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	sessionToken := c.Value
+	token := c.Value
 
-	delete(a.sessions, sessionToken)
+	a.sessions.remove(token)
 
 	log.Printf("user %q logged out", r.Context().Value(UserKey).(User).ID)
 

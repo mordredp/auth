@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"reflect"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // Login authenticates the session assigned to a user.
@@ -41,17 +39,16 @@ func (a *authenticator) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sessionToken := uuid.NewString()
 	expiresAt := time.Now().Add(a.maxSessionLength)
 
-	a.sessions[sessionToken] = session{
+	token := a.sessions.add(session{
 		ID:     c.Username,
 		expiry: expiresAt,
-	}
+	})
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     a.cookieName,
-		Value:    sessionToken,
+		Value:    token,
 		Expires:  expiresAt,
 		SameSite: http.SameSiteStrictMode,
 	})

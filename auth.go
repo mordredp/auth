@@ -10,23 +10,20 @@ import (
 
 // authenticator manages sessions and authentication providers.
 type authenticator struct {
-	sessions         map[string]session
+	sessions         *store
 	cookieName       string
 	maxSessionLength time.Duration
 	lastCleanup      time.Time
 	providers        []provider.Provider
 }
 
-// An Option modifies an authenticator or returns an error.
-type Option func(*authenticator) error
-
 // New initializes a new authenticator.
-func New(sessionSeconds int, options ...Option) *authenticator {
+func NewAuthenticator(maxSessionSeconds int, options ...Option) *authenticator {
 
 	a := authenticator{
-		sessions:         make(map[string]session),
+		sessions:         NewStore(),
 		cookieName:       uuid.NewString(),
-		maxSessionLength: time.Duration(sessionSeconds) * time.Second,
+		maxSessionLength: time.Duration(maxSessionSeconds) * time.Second,
 		lastCleanup:      time.Now(),
 		providers:        make([]provider.Provider, 0),
 	}
@@ -38,6 +35,8 @@ func New(sessionSeconds int, options ...Option) *authenticator {
 			continue
 		}
 	}
+
+	go a.sessions.loop() // start a goroutine to manage the sessions store
 
 	return &a
 }

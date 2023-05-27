@@ -11,7 +11,7 @@ type Static string
 // the one Static has been set to
 func (s Static) Authenticate(username string, password string) error {
 	if password != string(s) {
-		return errors.New("Static: invalid password")
+		return errors.New("invalid password")
 	}
 
 	return nil

@@ -6,6 +6,9 @@ import (
 	"github.com/go-ldap/ldap"
 )
 
+// An Option modifies a directory or returns an error.
+type Option func(d *directory) error
+
 // Bind verifies both the connection and bind status
 // to a directory with the credentials provided to it.
 func Bind(username string, password string) func(d *directory) error {

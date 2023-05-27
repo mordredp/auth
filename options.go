@@ -7,8 +7,19 @@ import (
 	"github.com/mordredp/auth/provider/ldap"
 )
 
+// An Option modifies an authenticator or returns an error.
+type Option func(*authenticator) error
+
+func CookieName(key string) Option {
+	return func(a *authenticator) error {
+		a.cookieName = key
+
+		return nil
+	}
+}
+
 // LDAP adds an LDAP provider to the Authenticator.
-func LDAP(addr string, baseDN string, username string, password string, options ...ldap.Option) func(a *authenticator) error {
+func LDAP(addr string, baseDN string, username string, password string, options ...ldap.Option) Option {
 	return func(a *authenticator) error {
 
 		ldapOptions := append([]ldap.Option{}, options...)
@@ -32,10 +43,10 @@ func LDAP(addr string, baseDN string, username string, password string, options 
 }
 
 // Static adds a Static provider to the Authenticator.
-func Static(password string) func(a *authenticator) error {
+func Static(password string) Option {
 	return func(a *authenticator) error {
 		a.providers = append(a.providers, provider.Static(password))
-		log.Printf("configured Static provider ")
+		log.Printf("configured Static provider")
 
 		return nil
 	}

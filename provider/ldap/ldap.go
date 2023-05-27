@@ -2,11 +2,11 @@ package ldap
 
 import (
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"net/url"
 
 	"github.com/go-ldap/ldap"
+	"github.com/pkg/errors"
 )
 
 // A directory represents an LDAP search domain.
@@ -19,16 +19,13 @@ type directory struct {
 	idKey      string
 }
 
-// An Option modifies a directory or returns an error.
-type Option func(d *directory) error
-
 // NewDirectory initializes an ldap client. The initialization fails if any
 // option returns an error.
 func NewDirectory(addr string, baseDN string, options ...Option) (*directory, error) {
 
 	url, err := url.Parse(addr)
 	if err != nil {
-		return nil, errors.New(addr + " is an invalid URL: " + err.Error())
+		return nil, errors.Wrap(err, fmt.Sprintf("%q is an invalid address", addr))
 	}
 
 	d := directory{
@@ -86,7 +83,7 @@ func (d *directory) Authenticate(username string, password string) error {
 	}
 
 	if len(sr.Entries) != 1 {
-		return fmt.Errorf("user %q does not exist or too many entries found", username)
+		return fmt.Errorf("found %d entries for user %q", len(sr.Entries), username)
 	}
 
 	userdn := sr.Entries[0].DN
