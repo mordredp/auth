@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 )
 
 // Default is a default implementation of a Provider.

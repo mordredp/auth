@@ -5,28 +5,30 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/mordredp/auth/provider"
 )
 
 // Login authenticates the session assigned to a user.
-// It tries to authenticate the session on all providers configured,
-// and returns as soon as the first one succeeds.
+// It tries to authenticate the session on all configured providers
+// in order of registration and returns as soon as the first one succeeds.
 func (a *authenticator) Login(w http.ResponseWriter, r *http.Request) {
 
-	c := Credentials{
+	creds := provider.Credentials{
 		Username: r.FormValue("username"),
 		Password: r.FormValue("password"),
 	}
 
-	var err error = fmt.Errorf("no providers authenticated %q", c.Username)
+	var err error = fmt.Errorf("no providers authenticated %q", creds.Username)
 
 	for _, provider := range a.providers {
 
-		if err := provider.Authenticate(c.Username, c.Password); err != nil {
-			log.Printf("provider: %s", err.Error())
+		if err := provider.Authenticate(creds); err != nil {
+			log.Printf("%T: %s", provider, err.Error())
 			continue
 		}
 
-		log.Printf("%T authenticated %q", provider, c.Username)
+		log.Printf("%T authenticated %q", provider, creds.Username)
 		err = nil
 		break
 	}
@@ -40,7 +42,7 @@ func (a *authenticator) Login(w http.ResponseWriter, r *http.Request) {
 	expiresAt := time.Now().Add(a.maxSessionLength)
 
 	token := a.sessions.add(session{
-		ID:     c.Username,
+		ID:     creds.Username,
 		expiry: expiresAt,
 	})
 

@@ -19,11 +19,14 @@ func CookieName(key string) Option {
 }
 
 // LDAP adds an LDAP provider to the Authenticator.
-func LDAP(addr string, baseDN string, username string, password string, options ...ldap.Option) Option {
+func LDAP(addr string, baseDN string, creds provider.Credentials, options ...ldap.Option) Option {
 	return func(a *authenticator) error {
 
 		ldapOptions := append([]ldap.Option{}, options...)
-		ldapOptions = append(ldapOptions, ldap.Bind(username, password))
+		ldapOptions = append(ldapOptions, ldap.Bind(provider.Credentials{
+			Username: creds.Username,
+			Password: creds.Password,
+		}))
 
 		ldap, err := ldap.NewDirectory(
 			addr,

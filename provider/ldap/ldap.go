@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/go-ldap/ldap"
+	"github.com/mordredp/auth/provider"
 	"github.com/pkg/errors"
 )
 
@@ -47,7 +48,7 @@ func NewDirectory(addr string, baseDN string, options ...Option) (*directory, er
 
 // Authenticate returns an error if the username is not found within
 // the directory or the username does not bind to it with the provided password.
-func (d *directory) Authenticate(username string, password string) error {
+func (d *directory) Authenticate(creds provider.Credentials) error {
 
 	conn, err := ldap.DialURL(d.bindAddr.String())
 	if err != nil {
@@ -72,7 +73,7 @@ func (d *directory) Authenticate(username string, password string) error {
 		0,
 		0,
 		false,
-		fmt.Sprintf("(&(objectClass=%s)(%s=%s))", d.classValue, d.idKey, ldap.EscapeFilter(username)),
+		fmt.Sprintf("(&(objectClass=%s)(%s=%s))", d.classValue, d.idKey, ldap.EscapeFilter(creds.Username)),
 		[]string{"dn"},
 		nil,
 	)
@@ -83,12 +84,12 @@ func (d *directory) Authenticate(username string, password string) error {
 	}
 
 	if len(sr.Entries) != 1 {
-		return fmt.Errorf("found %d entries for user %q", len(sr.Entries), username)
+		return fmt.Errorf("found %d entries for user %q", len(sr.Entries), creds.Username)
 	}
 
 	userdn := sr.Entries[0].DN
 
-	err = conn.Bind(userdn, password)
+	err = conn.Bind(userdn, creds.Password)
 	if err != nil {
 		return err
 	}

@@ -34,7 +34,7 @@ func NewAuthenticator(maxSessionSeconds int, options ...Option) *authenticator {
 		}
 	}
 
-	go a.sessions.listen()                              // start a goroutine to listen for operations on the sessions store
+	go a.sessions.listen()                              // start a goroutine to listen for operations
 	go a.sessions.startClearing(a.maxSessionLength / 2) // start a goroutine to clear expired sessions
 
 	return &a

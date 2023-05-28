@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 
 	"github.com/go-ldap/ldap"
+	"github.com/mordredp/auth/provider"
 )
 
 // An Option modifies a directory or returns an error.
@@ -11,7 +12,7 @@ type Option func(d *directory) error
 
 // Bind verifies both the connection and bind status
 // to a directory with the credentials provided to it.
-func Bind(username string, password string) func(d *directory) error {
+func Bind(creds provider.Credentials) func(d *directory) error {
 	return func(d *directory) error {
 		conn, err := ldap.DialURL(d.bindAddr.String())
 		if err != nil {
@@ -25,8 +26,8 @@ func Bind(username string, password string) func(d *directory) error {
 			return err
 		}
 
-		d.bindUser = username
-		d.bindPass = password
+		d.bindUser = creds.Username
+		d.bindPass = creds.Password
 
 		return conn.Bind(d.bindUser, d.bindPass)
 	}
