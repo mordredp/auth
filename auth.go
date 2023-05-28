@@ -13,7 +13,6 @@ type authenticator struct {
 	sessions         *store
 	cookieName       string
 	maxSessionLength time.Duration
-	lastCleanup      time.Time
 	providers        []provider.Provider
 }
 
@@ -24,7 +23,6 @@ func NewAuthenticator(maxSessionSeconds int, options ...Option) *authenticator {
 		sessions:         NewStore(),
 		cookieName:       uuid.NewString(),
 		maxSessionLength: time.Duration(maxSessionSeconds) * time.Second,
-		lastCleanup:      time.Now(),
 		providers:        make([]provider.Provider, 0),
 	}
 
@@ -36,7 +34,8 @@ func NewAuthenticator(maxSessionSeconds int, options ...Option) *authenticator {
 		}
 	}
 
-	go a.sessions.loop() // start a goroutine to manage the sessions store
+	go a.sessions.listen()                              // start a goroutine to listen for operations on the sessions store
+	go a.sessions.startClearing(a.maxSessionLength / 2) // start a goroutine to clear expired sessions
 
 	return &a
 }

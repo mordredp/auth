@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -61,23 +62,35 @@ func (s *store) remove(token string) {
 func (s *store) clear() int {
 	result := make(chan int, 1)
 	s.ops <- func(sessions map[string]session) {
-		deleted := 0
+		deletedCount := 0
 		for token, session := range sessions {
 			if session.expiry.Before(time.Now()) {
 				delete(sessions, token)
-				deleted++
+				deletedCount++
 			}
 		}
-		result <- deleted
+		result <- deletedCount
 	}
 	return <-result
 }
 
 // loop initializes the sessions map which associates a token to a session,
 // and starts listening on the store channel for operations.
-func (s *store) loop() {
+func (s *store) listen() {
+	log.Printf("store started listening for operations ...")
 	sessions := make(map[string]session)
 	for op := range s.ops {
 		op(sessions)
+	}
+}
+
+func (s *store) startClearing(period time.Duration) {
+	log.Printf("store started clearing sessions every %s ...", period)
+	ticker := time.NewTicker(period)
+
+	for {
+		tick := <-ticker.C
+		clearedCount := s.clear()
+		log.Printf("cleared %d sessions in %s", clearedCount, time.Since(tick))
 	}
 }

@@ -36,7 +36,7 @@ func LDAP(addr string, baseDN string, username string, password string, options 
 		}
 
 		a.providers = append(a.providers, ldap)
-		log.Printf("configured LDAP provider on %q with base DN %q", addr, baseDN)
+		log.Printf("configured %T on %q with base DN %q", ldap, addr, baseDN)
 
 		return nil
 	}
@@ -45,8 +45,9 @@ func LDAP(addr string, baseDN string, username string, password string, options 
 // Static adds a Static provider to the Authenticator.
 func Static(password string) Option {
 	return func(a *authenticator) error {
-		a.providers = append(a.providers, provider.Static(password))
-		log.Printf("configured Static provider")
+		static := provider.Static(password)
+		a.providers = append(a.providers, static)
+		log.Printf("configured %T", static)
 
 		return nil
 	}

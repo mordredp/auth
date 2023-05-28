@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"reflect"
 	"time"
 )
 
@@ -18,8 +17,7 @@ func (a *authenticator) Login(w http.ResponseWriter, r *http.Request) {
 		Password: r.FormValue("password"),
 	}
 
-	var err error = fmt.Errorf("no providers authenticated user %q", c.Username)
-	var goodProvider string
+	var err error = fmt.Errorf("no providers authenticated %q", c.Username)
 
 	for _, provider := range a.providers {
 
@@ -28,7 +26,7 @@ func (a *authenticator) Login(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		goodProvider = reflect.TypeOf(provider).String()
+		log.Printf("%T authenticated %q", provider, c.Username)
 		err = nil
 		break
 	}
@@ -52,8 +50,6 @@ func (a *authenticator) Login(w http.ResponseWriter, r *http.Request) {
 		Expires:  expiresAt,
 		SameSite: http.SameSiteStrictMode,
 	})
-
-	log.Printf("user %q logged in with %q", c.Username, goodProvider)
 
 	http.Redirect(w, r, "/", http.StatusFound)
 }

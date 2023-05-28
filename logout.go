@@ -27,7 +27,7 @@ func (a *authenticator) Logout(w http.ResponseWriter, r *http.Request) {
 
 	a.sessions.remove(token)
 
-	log.Printf("user %q logged out", r.Context().Value(UserKey).(User).ID)
+	log.Printf("%q logged out", r.Context().Value(UserKey).(User).ID)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     a.cookieName,
