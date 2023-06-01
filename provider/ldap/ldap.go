@@ -66,6 +66,8 @@ func (d *directory) Authenticate(creds provider.Credentials) error {
 		return err
 	}
 
+	query := fmt.Sprintf("(&(objectClass=%s)(%s=%s))", d.classValue, d.idKey, ldap.EscapeFilter(creds.Username))
+
 	searchRequest := ldap.NewSearchRequest(
 		d.baseDN,
 		ldap.ScopeWholeSubtree,
@@ -73,7 +75,7 @@ func (d *directory) Authenticate(creds provider.Credentials) error {
 		0,
 		0,
 		false,
-		fmt.Sprintf("(&(objectClass=%s)(%s=%s))", d.classValue, d.idKey, ldap.EscapeFilter(creds.Username)),
+		query,
 		[]string{"dn"},
 		nil,
 	)
@@ -84,7 +86,7 @@ func (d *directory) Authenticate(creds provider.Credentials) error {
 	}
 
 	if len(sr.Entries) != 1 {
-		return fmt.Errorf("found %d entries for user %q", len(sr.Entries), creds.Username)
+		return errors.Errorf("found %d entries for %q", len(sr.Entries), query)
 	}
 
 	userdn := sr.Entries[0].DN

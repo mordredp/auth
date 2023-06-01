@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -19,25 +18,14 @@ func (a *authenticator) Login(w http.ResponseWriter, r *http.Request) {
 		Password: r.FormValue("password"),
 	}
 
-	var err error = fmt.Errorf("no providers authenticated %q", creds.Username)
-
-	for _, provider := range a.providers {
-
-		if err := provider.Authenticate(creds); err != nil {
-			log.Printf("%T: %s", provider, err.Error())
-			continue
-		}
-
-		log.Printf("%T authenticated %q", provider, creds.Username)
-		err = nil
-		break
-	}
-
+	provider, err := a.providers.Authenticate(creds)
 	if err != nil {
 		log.Println(err.Error())
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
+
+	log.Printf("%T authenticated %q", *provider, creds.Username)
 
 	expiresAt := time.Now().Add(a.maxSessionLength)
 

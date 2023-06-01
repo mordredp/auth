@@ -9,6 +9,6 @@ type Default struct{}
 
 // Authenticate always returns an error signaling that
 // the default provider is being used.
-func (d *Default) Authenticate(username string, password string) error {
+func (d *Default) Authenticate(creds Credentials) error {
 	return errors.New("will never authenticate")
 }

@@ -13,7 +13,7 @@ type authenticator struct {
 	sessions         *store
 	cookieName       string
 	maxSessionLength time.Duration
-	providers        []provider.Provider
+	providers        provider.Pool
 }
 
 // New initializes a new authenticator.

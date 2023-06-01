@@ -71,16 +71,6 @@ func (s *store) clear() int {
 	return <-result
 }
 
-// loop initializes a map of sessions which associates a token to a session,
-// starts listening on the channel for operations, and executes them.
-func (s *store) listen() {
-	log.Printf("store started listening for operations ...")
-	sessions := make(map[string]session)
-	for op := range s.ops {
-		op(sessions)
-	}
-}
-
 // startClearing starts a ticker with the specified period
 // which will clear the store on every tick.
 func (s *store) startClearing(period time.Duration) {
@@ -91,5 +81,15 @@ func (s *store) startClearing(period time.Duration) {
 		tick := <-ticker.C
 		clearedCount := s.clear()
 		log.Printf("cleared %d sessions in %s", clearedCount, time.Since(tick))
+	}
+}
+
+// listen initializes a map of sessions which associates a token to a session,
+// starts listening on the channel for operations, and executes them.
+func (s *store) listen() {
+	log.Printf("store started listening for operations ...")
+	sessions := make(map[string]session)
+	for op := range s.ops {
+		op(sessions)
 	}
 }
