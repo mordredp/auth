@@ -16,7 +16,7 @@ type store struct {
 }
 
 // NewStore initializes the operations channel for the store.
-func NewStore() *store {
+func newStore() *store {
 	return &store{
 		ops: make(chan operation),
 	}

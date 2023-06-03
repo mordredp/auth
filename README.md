@@ -13,7 +13,7 @@ It strives to be idiomatic, depend mostly on stdlib, and be simple to use.
 * **No external dependencies** - plain ol' Go stdlib + `net/http`
 -->
 * **context** - built on new `context` package to pass information to the handlers
-* **go.mod support** - 
+* **go.mod support** - go.mod which lists all dependencies included
 
 ## Examples
 ```go
@@ -21,24 +21,37 @@ package main
 
 import (
 	"net/http"
+	"text/template"
 
 	"github.com/mordredp/auth"
 )
 
 func main() {
-	authenticator := auth.New(120, auth.Static("test"))
+	authenticator := auth.NewAuthenticator(30, auth.Static("test"))
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome"))
+	home := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		var user auth.User
+		if v, ok := r.Context().Value(auth.UserKey).(auth.User); ok {
+			user = v
+		}
+
+		if !user.Authenticated {
+			tpl := template.Must(template.ParseGlob("*.gohtml"))
+			tpl.ExecuteTemplate(w, "index.gohtml", user)
+		} else {
+			w.Write([]byte("welcome " + user.ID))
+		}
 	})
 
-    //TODO: add example
+	mux.Handle("/", authenticator.Identify(home))
+	mux.HandleFunc("/login", authenticator.Login)
+	mux.HandleFunc("/logout", authenticator.Logout)
 
-	http.ListenAndServe(":3000", mux)
+	http.ListenAndServe(":8080", mux)
 }
-
 ```
 
 ## Handlers
@@ -48,7 +61,6 @@ func main() {
 | :--------------------- | :------------------------ |
 | [auth.Login]           | creates a session         |
 | [auth.Logout]          | deletes a session         |
-| [auth.Refresh]         | refreshes a session token |
 | [TODO]                 | TODO                      |
 ------------------------------------------------------
 

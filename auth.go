@@ -20,7 +20,7 @@ type authenticator struct {
 func NewAuthenticator(maxSessionSeconds int, options ...Option) *authenticator {
 
 	a := authenticator{
-		sessions:         NewStore(),
+		sessions:         newStore(),
 		cookieName:       uuid.NewString(),
 		maxSessionLength: time.Duration(maxSessionSeconds) * time.Second,
 		providers:        make([]provider.Provider, 0),

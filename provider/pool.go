@@ -18,7 +18,7 @@ type result struct {
 
 // Authenticate calls starts an authentication goroutine on all Providers in the
 // pool in a concurrent fashion. It waits for all Providers to complete and
-// returns the first Provider which authenticated successfull or an error.
+// returns the first Provider which authenticated successfully or an error.
 func (p Pool) Authenticate(creds Credentials) (*Provider, error) {
 
 	results := make(chan result, len(p))
