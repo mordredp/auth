@@ -26,9 +26,9 @@ type User struct {
 func (a *authenticator) Identify(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		c, err := r.Cookie(a.cookieName)
-
 		var token string
+
+		c, err := r.Cookie(a.cookieName)
 
 		switch err {
 		case nil:
@@ -50,15 +50,15 @@ func (a *authenticator) Identify(next http.Handler) http.Handler {
 			return
 		}
 
-		usr := User{}
+		user := User{}
 
 		sess, ok := a.sessions.exists(token)
 		if ok {
-			usr.ID = sess.ID
-			usr.Authenticated = true
+			user.ID = sess.ID
+			user.Authenticated = true
 		}
 
-		ctx := context.WithValue(r.Context(), UserKey, usr)
+		ctx := context.WithValue(r.Context(), UserKey, user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

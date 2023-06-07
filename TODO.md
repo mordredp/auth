@@ -1,2 +1,2 @@
 # TODO
-## - rate limiting on provider pool
+- rate limiting on provider pool

@@ -5,6 +5,7 @@ import (
 
 	"github.com/mordredp/auth/provider"
 	"github.com/mordredp/auth/provider/ldap"
+	"github.com/mordredp/auth/provider/static"
 )
 
 // An Option modifies an authenticator or returns an error.
@@ -48,9 +49,9 @@ func LDAP(addr string, baseDN string, creds provider.Credentials, options ...lda
 // Static adds a Static provider to the Authenticator.
 func Static(password string) Option {
 	return func(a *authenticator) error {
-		static := provider.Static(password)
-		a.providers = append(a.providers, static)
-		log.Printf("configured %T", static)
+		provider := static.Static(password)
+		a.providers = append(a.providers, provider)
+		log.Printf("configured %T", provider)
 
 		return nil
 	}

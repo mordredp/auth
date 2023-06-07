@@ -41,7 +41,7 @@ func (p Pool) Authenticate(creds Credentials) (*Provider, error) {
 	close(results)
 
 	elapsed := time.Since(start)
-	jitter, err := rand.Int(rand.Reader, big.NewInt(elapsed.Nanoseconds()/10))
+	jitter, err := rand.Int(rand.Reader, big.NewInt(elapsed.Nanoseconds()/8))
 	if err != nil {
 		return nil, err
 	}
