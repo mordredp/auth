@@ -33,13 +33,21 @@ func Bind(creds provider.Credentials) func(d *directory) error {
 	}
 }
 
-// Fields sets some parameters for the LDAP filter:
-// classValue sets the value for the parameter "objectClass"
-// and idKey sets the name of the field to use for identification.
-func Fields(classValue string, idKey string) func(d *directory) error {
+// IdKey sets the name of the query parameter to use for identification.
+func IdKey(key string) func(d *directory) error {
 	return func(d *directory) error {
-		d.classValue = classValue
-		d.idKey = idKey
+		d.idKey = key
+
+		return nil
+	}
+}
+
+// QueryParams sets the query parameters to use for identification
+func QueryParams(params map[string]string) func(d *directory) error {
+	return func(d *directory) error {
+		for key, value := range params {
+			d.queryParams[key] = value
+		}
 
 		return nil
 	}

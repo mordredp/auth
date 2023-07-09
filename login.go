@@ -25,7 +25,7 @@ func (a *authenticator) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("%T authenticated %q", *provider, creds.Username)
+	log.Printf("provider %T authenticated %q", *provider, creds.Username)
 
 	expiresAt := time.Now().Add(a.maxSessionLength)
 

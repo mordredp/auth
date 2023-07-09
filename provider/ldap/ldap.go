@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/go-ldap/ldap"
 	"github.com/mordredp/auth/provider"
@@ -12,12 +13,12 @@ import (
 
 // A directory represents an LDAP search domain.
 type directory struct {
-	bindAddr   url.URL
-	bindUser   string
-	bindPass   string
-	baseDN     string
-	classValue string
-	idKey      string
+	bindAddr    url.URL
+	bindUser    string
+	bindPass    string
+	baseDN      string
+	idKey       string
+	queryParams map[string]string
 }
 
 // NewDirectory initializes an ldap client. The initialization fails if any
@@ -30,10 +31,10 @@ func NewDirectory(addr string, baseDN string, options ...Option) (*directory, er
 	}
 
 	d := directory{
-		bindAddr:   *url,
-		baseDN:     baseDN,
-		classValue: "organizationalPerson",
-		idKey:      "uid",
+		bindAddr:    *url,
+		baseDN:      baseDN,
+		idKey:       "id",
+		queryParams: make(map[string]string),
 	}
 
 	for _, option := range options {
@@ -44,6 +45,25 @@ func NewDirectory(addr string, baseDN string, options ...Option) (*directory, er
 	}
 
 	return &d, nil
+}
+
+// buildQuery returns a query string to be used for authentication. It builds
+// the query using the idKey and queryParams set on the directory.
+func (d *directory) buildQuery(creds provider.Credentials) string {
+
+	d.queryParams[d.idKey] = ldap.EscapeFilter(creds.Username)
+
+	paramFmt := "(%s=%s)"
+	var queryFmtBuilder strings.Builder
+
+	var andParams []any
+
+	for key, value := range d.queryParams {
+		andParams = append(andParams, fmt.Sprintf(paramFmt, key, value))
+		queryFmtBuilder.WriteString("%s")
+	}
+
+	return fmt.Sprintf("(&%s)", fmt.Sprintf(queryFmtBuilder.String(), andParams...))
 }
 
 // Authenticate returns an error if the username is not found within
@@ -66,7 +86,7 @@ func (d *directory) Authenticate(creds provider.Credentials) error {
 		return err
 	}
 
-	query := fmt.Sprintf("(&(objectClass=%s)(%s=%s))", d.classValue, d.idKey, ldap.EscapeFilter(creds.Username))
+	query := d.buildQuery(creds)
 
 	searchRequest := ldap.NewSearchRequest(
 		d.baseDN,
