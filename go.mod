@@ -2,8 +2,6 @@ module github.com/mordredp/auth
 
 go 1.20
 
-retract v1.0.0 // untagged release
-
 require (
 	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/google/uuid v1.3.0
