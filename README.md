@@ -14,6 +14,7 @@ It strives to be idiomatic, depend mostly on stdlib, and be simple to use.
 -->
 * **context** - built on new `context` package to pass information to the handlers
 * **go.mod support** - go.mod which lists all dependencies included
+* **extensible** - `Provider` interface allows to implement custom authentication providers (`Default`, `Static` and `LDAP` already included)
 
 ## Examples
 ```go
@@ -27,7 +28,7 @@ import (
 )
 
 func main() {
-	authenticator := auth.NewAuthenticator(30, auth.Static("test"))
+	authenticator := auth.NewAuthenticator(auth.Static("test"))
 
 	mux := http.NewServeMux()
 
@@ -61,7 +62,7 @@ func main() {
 | :--------------------- | :------------------------ |
 | [auth.Login]           | creates a session         |
 | [auth.Logout]          | deletes a session         |
-| [TODO]                 | TODO                      |
+| [auth.Authorize]       | authorizes a session      |
 ------------------------------------------------------
 
 ## Providers

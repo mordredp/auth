@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	authenticator := auth.NewAuthenticator(30, auth.Static("test"))
+	authenticator := auth.NewAuthenticator(auth.Static("test"))
 
 	mux := http.NewServeMux()
 
@@ -28,8 +28,8 @@ func main() {
 	})
 
 	mux.Handle("/", authenticator.Identify(home))
-	mux.HandleFunc("/login", authenticator.Login)
-	mux.HandleFunc("/logout", authenticator.Logout)
+	mux.Handle("/login", authenticator.Identify(http.HandlerFunc(authenticator.Login)))
+	mux.Handle("/logout", authenticator.Identify(http.HandlerFunc(authenticator.Logout)))
 
 	http.ListenAndServe(":8080", mux)
 }

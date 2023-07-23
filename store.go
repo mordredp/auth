@@ -80,7 +80,10 @@ func (s *store) startClearing(period time.Duration) {
 	for {
 		tick := <-ticker.C
 		clearedCount := s.clear()
-		log.Printf("cleared %d sessions in %s", clearedCount, time.Since(tick))
+
+		if clearedCount > 0 {
+			log.Printf("cleared %d expired sessions in %s", clearedCount, time.Since(tick))
+		}
 	}
 }
 

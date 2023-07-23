@@ -17,19 +17,19 @@ type authenticator struct {
 }
 
 // New initializes a new authenticator.
-func NewAuthenticator(maxSessionSeconds int, options ...Option) *authenticator {
+func NewAuthenticator(options ...Option) *authenticator {
 
 	a := authenticator{
 		sessions:         newStore(),
 		cookieName:       uuid.NewString(),
-		maxSessionLength: time.Duration(maxSessionSeconds) * time.Second,
+		maxSessionLength: 60 * time.Second,
 		providers:        make([]provider.Provider, 0),
 	}
 
 	for _, option := range options {
 		err := option(&a)
 		if err != nil {
-			log.Printf("options: %s", err)
+			log.Printf("%T: %s", a, err)
 			continue
 		}
 	}
