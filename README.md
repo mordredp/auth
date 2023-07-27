@@ -15,6 +15,7 @@ It strives to be idiomatic, depend mostly on stdlib, and be simple to use.
 * **context** - built on new `context` package to pass information to the handlers
 * **go.mod support** - go.mod which lists all dependencies included
 * **extensible** - `Provider` interface allows to implement custom authentication providers (`Default`, `Static` and `LDAP` already included)
+* **fast** - it implements a session store which queries multiple providers concurrently and manages session expiration in its own goroutine
 
 ## Examples
 ```go
